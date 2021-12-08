@@ -633,7 +633,7 @@ func (a *applierV3backend) applyTxn(ctx context.Context, txn mvcc.TxnWrite, rt *
 				traceutil.Field{Key: "req_type", Value: "range"},
 				traceutil.Field{Key: "range_begin", Value: string(tv.RequestRange.Key)},
 				traceutil.Field{Key: "range_end", Value: string(tv.RequestRange.RangeEnd)})
-			resp, err := a.Range(ctx, txn, tv.RequestRange)
+			resp, err := a.Range(context.TODO(), txn, tv.RequestRange)
 			if err != nil {
 				lg.Panic("unexpected error during txn", zap.Error(err))
 			}
@@ -644,7 +644,7 @@ func (a *applierV3backend) applyTxn(ctx context.Context, txn mvcc.TxnWrite, rt *
 				traceutil.Field{Key: "req_type", Value: "put"},
 				traceutil.Field{Key: "key", Value: string(tv.RequestPut.Key)},
 				traceutil.Field{Key: "req_size", Value: tv.RequestPut.Size()})
-			resp, _, err := a.Put(ctx, txn, tv.RequestPut)
+			resp, _, err := a.Put(context.TODO(), txn, tv.RequestPut)
 			if err != nil {
 				lg.Panic("unexpected error during txn", zap.Error(err))
 			}
@@ -658,7 +658,7 @@ func (a *applierV3backend) applyTxn(ctx context.Context, txn mvcc.TxnWrite, rt *
 			respi.(*pb.ResponseOp_ResponseDeleteRange).ResponseDeleteRange = resp
 		case *pb.RequestOp_RequestTxn:
 			resp := respi.(*pb.ResponseOp_ResponseTxn).ResponseTxn
-			applyTxns := a.applyTxn(ctx, txn, tv.RequestTxn, txnPath[1:], resp)
+			applyTxns := a.applyTxn(context.TODO(), txn, tv.RequestTxn, txnPath[1:], resp)
 			txns += applyTxns + 1
 			txnPath = txnPath[applyTxns+1:]
 		default:
